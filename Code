@@ -1,0 +1,132 @@
+#include<stdio.h>
+#include<conio.h>
+#include<pthread.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<sys/types.h>
+#define MAX_PID 1000
+#define MIN_PID 100
+
+int var=MIN_PID;
+
+int *stack;
+int n=0;
+int allocateMap()
+{
+	  	    	
+	stack= new int[100];
+	
+}
+int check(int x)
+{
+	int flag=0;
+	struct pid *temp=generator;
+	while(temp!=NULL)
+	{
+	
+		if(temp->address==x)
+		{
+			
+			flag=1;
+			break;
+		}
+	    temp=temp->next;
+		
+	}
+	if(flag==1)
+	{
+		return 0;
+	}
+	else
+	{
+	
+		return 1;
+	}
+	
+}
+
+
+
+int allocatePID()
+{
+	int flag=0;
+	for(int i =0 ; i<n;i++)
+	{
+		if(*(stack+i)==var)
+		{
+			var++;
+		}
+		
+	}
+	n=n+1;
+	*(stack+n)=var;
+	return var;
+	
+	
+
+	 
+}
+
+
+void release(int pp)
+{
+	int pos;
+	for(int i=0;i<n;i++)
+	{
+		if(pp==*(stack+i))
+		{
+			pos=i;
+		}
+	}
+	for(int i = pos ;i <n ;i++)
+	{
+		*(stack+i)=*(stack+i+1);
+	}
+	n=n-1;
+}
+
+
+void* func1()
+{
+	int x = allocatePID();
+	printf("the allocated process id is %d",x);
+	printf("Thread completed process id released");
+	release(x);
+	
+}
+
+void* func2()
+{
+	int x = allocatePID();
+	printf("id allocated %d",x);
+	printf("Thread completed id released");
+	release(x);
+}
+
+void* func3()
+{
+	int x = allocatePID();
+	printf("Id allocated %d",x);
+	printf("Thread completed id released");
+	release(x);
+}
+
+main()
+{
+	if(allocateMap())
+	{
+		printf("Generator set correctly");
+		
+	}
+	pthread_t pid1,pid2,pid3;
+	pthread_create(&pid1,NULL,func1,NULL);
+	pthread_create(&pid2,NULL,func2,NULL);	
+	pthread_join(pid1,NULL);
+	pthread_join(pid2,NULL);
+	pthread_create(&pid2,NULL,func3,NULL);
+	pthread_join(pid3,NULL);
+	
+	
+	
+}
+
